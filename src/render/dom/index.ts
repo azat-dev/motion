@@ -4,7 +4,11 @@ import { useDomVisualElement } from "./use-dom-visual-element"
 import { render } from "./render"
 import { parseDomVariant } from "./utils/parse-dom-variant"
 import { createMotionComponent } from "../../motion"
-import { HTMLMotionComponents, SVGMotionComponents } from "./types"
+import {
+    HTMLMotionComponents,
+    SVGMotionComponents,
+    KonvaMotionComponents,
+} from "./types"
 import { Drag } from "../../motion/features/drag"
 import { Gestures } from "../../motion/features/gestures"
 import { Exit } from "../../motion/features/exit"
@@ -12,6 +16,7 @@ import { Animation } from "../../motion/features/animation"
 import { AnimateLayout } from "../../motion/features/layout/Animate"
 import { MeasureLayout } from "../../motion/features/layout/Measure"
 import { MotionFeature } from "../../motion/features/types"
+import { konvaElements } from "./utils/supported-elements"
 
 /**
  * I'd rather the return type of `custom` to be implicit but this throws
@@ -22,6 +27,10 @@ export type CustomDomComponent<Props> = React.ForwardRefExoticComponent<
     React.PropsWithoutRef<Props & MotionProps> &
         React.RefAttributes<SVGElement | HTMLElement>
 >
+
+export function isKonvaComponent(component: string): boolean {
+    return konvaElements.includes(component as any)
+}
 
 /**
  * Convert any React component into a `motion` component. The provided component
@@ -38,14 +47,27 @@ export type CustomDomComponent<Props> = React.ForwardRefExoticComponent<
  * @public
  */
 
-function createMotionProxy(defaultFeatures: MotionFeature[]) {
+function createMotionProxy(
+    defaultFeatures: MotionFeature[],
+    konvaDefaultFeatures: MotionFeature[]
+) {
     type CustomMotionComponent = { custom: typeof custom }
     type Motion = HTMLMotionComponents &
         SVGMotionComponents &
-        CustomMotionComponent
+        CustomMotionComponent &
+        KonvaMotionComponents
 
     const config: MotionComponentConfig<HTMLElement | SVGElement> = {
         defaultFeatures,
+        useVisualElement: useDomVisualElement as any,
+        render: render as any,
+        animationControlsConfig: {
+            makeTargetAnimatable: parseDomVariant,
+        },
+    }
+
+    const konvaConfig: MotionComponentConfig<HTMLElement | SVGElement> = {
+        defaultFeatures: konvaDefaultFeatures,
         useVisualElement: useDomVisualElement as any,
         render: render as any,
         animationControlsConfig: {
@@ -64,7 +86,11 @@ function createMotionProxy(defaultFeatures: MotionFeature[]) {
         if (key === "custom") return target.custom
 
         if (!componentCache.has(key)) {
-            componentCache.set(key, createMotionComponent(key, config))
+            if (isKonvaComponent(key)) {
+                componentCache.set(key, createMotionComponent(key, konvaConfig))
+            } else {
+                componentCache.set(key, createMotionComponent(key, config))
+            }
         }
 
         return componentCache.get(key)
@@ -79,16 +105,15 @@ function createMotionProxy(defaultFeatures: MotionFeature[]) {
  *
  * @public
  */
-export const motion = /*@__PURE__*/ createMotionProxy([
-    MeasureLayout,
-    Animation,
-    Drag,
-    Gestures,
-    Exit,
-    AnimateLayout,
-])
+export const motion = /*@__PURE__*/ createMotionProxy(
+    [MeasureLayout, Animation, Drag, Gestures, Exit, AnimateLayout],
+    [Animation]
+)
 
 /**
  * @public
  */
-export const m = /*@__PURE__*/ createMotionProxy([MeasureLayout])
+export const m = /*@__PURE__*/ createMotionProxy(
+    [MeasureLayout],
+    [MeasureLayout]
+)

@@ -346,16 +346,17 @@ export interface LayoutProps {
 
 // Warning: (ae-forgotten-export) The symbol "HTMLMotionComponents" needs to be exported by the entry point index.d.ts
 // Warning: (ae-forgotten-export) The symbol "SVGMotionComponents" needs to be exported by the entry point index.d.ts
+// Warning: (ae-forgotten-export) The symbol "KonvaMotionComponents" needs to be exported by the entry point index.d.ts
 // 
 // @public (undocumented)
 export const m: HTMLMotionComponents & SVGMotionComponents & {
     custom: <Props>(Component: string | React.ComponentClass<Props, any> | React.FunctionComponent<Props>) => CustomDomComponent<Props>;
-};
+} & KonvaMotionComponents;
 
 // @public
 export const motion: HTMLMotionComponents & SVGMotionComponents & {
     custom: <Props>(Component: string | React.ComponentClass<Props, any> | React.FunctionComponent<Props>) => CustomDomComponent<Props>;
-};
+} & KonvaMotionComponents;
 
 // @public (undocumented)
 export interface MotionAdvancedProps {
@@ -712,6 +713,9 @@ export function useInvertedScale(scale?: Partial<ScaleMotionValues>): ScaleMotio
 
 // @public (undocumented)
 export function useIsPresent(): boolean;
+
+// @public
+export function useMotionTemplate(fragments: TemplateStringsArray, ...values: MotionValue[]): MotionValue<string>;
 
 // @public
 export function useMotionValue<T>(initial: T): MotionValue<T>;

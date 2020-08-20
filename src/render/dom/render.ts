@@ -6,6 +6,11 @@ import { buildHTMLProps } from "./utils/build-html-props"
 import { buildSVGProps } from "./utils/build-svg-props"
 import { SVGVisualElement } from "./SVGVisualElement"
 import { isSVGComponent } from "./utils/is-svg-component"
+import { konvaElements } from "./utils/supported-elements"
+
+export function isKonvaComponent(component: string): boolean {
+    return konvaElements.includes(component as any)
+}
 
 export function render<Props>(
     Component: string | React.ComponentType<Props>,
@@ -27,9 +32,17 @@ export function render<Props>(
     visualElement.build()
 
     // Generate props to visually render this component
-    const visualProps = isSVGComponent(Component)
+    let visualProps = isSVGComponent(Component)
         ? buildSVGProps(visualElement as SVGVisualElement)
         : buildHTMLProps(visualElement as HTMLVisualElement, props)
+
+    if (isKonvaComponent(Component as any)) {
+        visualProps = {
+            ...props,
+            ...visualElement.reactStyle,
+            ...visualElement.style,
+        }
+    }
 
     return createElement<any>(Component, {
         ...forwardedProps,

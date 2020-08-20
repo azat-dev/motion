@@ -182,3 +182,21 @@ export const svgElements = [
     "view",
 ] as const
 export type SVGElements = UnionStringArray<typeof svgElements>
+
+/**
+ * @internal
+ */
+export const konvaElements = [
+    "Path",
+    "Rect",
+    "Line",
+    "Circle",
+    "Arc",
+    "Arrow",
+    "Ellipse",
+    "Image",
+    "Shape",
+    "Text",
+    "TextPath",
+] as const
+export type KonvaElements = UnionStringArray<typeof konvaElements>

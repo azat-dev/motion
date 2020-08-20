@@ -84,7 +84,10 @@ function addMotionValues(
                 visualElement.addValue(key, value)
                 foundMotionValue = true
             }
-        } else if (isTransformProp(key) || isTransformOriginProp(key)) {
+        } else if (
+            !(visualElement as any).isKonva &&
+            (isTransformProp(key) || isTransformOriginProp(key))
+        ) {
             // If this is a transform prop, always create a MotionValue
             // to ensure we can reconcile them all together.
             if (!visualElement.hasValue(key)) {

@@ -9,7 +9,11 @@ import {
 } from "react"
 import { MotionProps, MakeMotion } from "../../motion/types"
 import { TransformPoint2D } from "../../types/geometry"
-import { HTMLElements, SVGElements } from "./utils/supported-elements"
+import {
+    HTMLElements,
+    SVGElements,
+    KonvaElements,
+} from "./utils/supported-elements"
 import { VisualElementConfig } from "../types"
 
 /**
@@ -100,6 +104,17 @@ export type HTMLMotionProps<
     MotionProps
 
 /**
+ * @public
+ */
+export type KonvaMotionProps<
+    TagName extends keyof ReactHTML
+> = HTMLAttributesWithoutMotionProps<
+    UnwrapFactoryAttributes<ReactHTML[TagName]>,
+    UnwrapFactoryElement<ReactHTML[TagName]>
+> &
+    MotionProps
+
+/**
  * Motion-optimised versions of React's HTML components.
  *
  * @public
@@ -109,6 +124,15 @@ export type HTMLMotionComponents = {
         UnwrapFactoryElement<ReactHTML[K]>,
         HTMLMotionProps<K>
     >
+}
+
+/**
+ * Motion-optimised versions of React's konva components.
+ *
+ * @public
+ */
+export type KonvaMotionComponents = {
+    [K in KonvaElements]: any
 }
 
 interface SVGAttributesWithoutMotionProps<T>
